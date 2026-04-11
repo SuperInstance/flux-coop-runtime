@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "flux-coop-runtime"
+version = "0.1.0"
+description = "Cooperative execution runtime for FLUX fleet agents"
+requires-python = ">=3.8"
+
+[tool.pytest.ini_options]
+testpaths = ["src", "tests"]
+python_files = ["test_*.py"]
