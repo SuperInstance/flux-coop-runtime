@@ -82,6 +82,17 @@ class TestRuntimeAsk:
         with pytest.raises(CooperativeRuntimeError, match="BAD_OPCODE"):
             runtime.ask("Oracle1", "execute_bytecode", {"bytecode": [0xFF]})
 
+    def test_ask_timeout_with_fallback_local(self, runtime, mock_transport):
+        mock_transport.poll_for_response.return_value = None
+        result = runtime.ask("Oracle1", "ping", {}, timeout_ms=100, fallback="local")
+        assert result["status"] == "fallback_local"
+        assert "timeout" in result["reason"]
+
+    def test_ask_unknown_target_with_fallback_local(self, runtime, mock_transport):
+        result = runtime.ask("Nonexistent", "ping", {}, fallback="local")
+        assert result["status"] == "fallback_local"
+        assert "Cannot resolve" in result["reason"]
+
 
 class TestRuntimeTell:
     """Test TELL opcode execution."""
