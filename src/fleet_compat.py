@@ -40,7 +40,9 @@ except ImportError:
     _STDLIB_AVAILABLE = False
 
     # Minimal stubs so the module never hard-crashes during early migration.
-    class ErrorCode:  # type: ignore[no-redef]
+    from enum import Enum as _Enum
+
+    class ErrorCode(_Enum):  # type: ignore[no-redef]
         COOP_NO_CAPABLE_AGENT = "COOP_NO_CAPABLE_AGENT"
         COOP_TIMEOUT = "COOP_TIMEOUT"
         COOP_TASK_EXPIRED = "COOP_TASK_EXPIRED"
@@ -52,6 +54,7 @@ except ImportError:
         def __init__(self, code: str, message: str, **kw: Any) -> None:
             self.code = code
             self.message = message
+            self.context: Dict[str, Any] = kw.get("context", {})
             super().__init__(f"[{code}] {message}")
 
     class Severity:  # type: ignore[no-redef]
@@ -62,9 +65,11 @@ except ImportError:
 
     class Status:  # type: ignore[no-redef]
         SUCCESS = "SUCCESS"
+        PENDING = "PENDING"
         TIMEOUT = "TIMEOUT"
         ERROR = "ERROR"
         REFUSED = "REFUSED"
+        CANCELLED = "CANCELLED"
 
     def status_for_error_code(code: str) -> "Status":  # type: ignore[misc]
         return Status.ERROR
@@ -77,11 +82,11 @@ except ImportError:
 # existing ``from src.runtime import ERR_*`` statements can be redirected
 # to ``from src.fleet_compat import ERR_*`` with zero code changes.
 
-ERR_NO_CAPABLE_AGENT = ErrorCode.COOP_NO_CAPABLE_AGENT.value
-ERR_TIMEOUT = ErrorCode.COOP_TIMEOUT.value
-ERR_TRANSPORT_FAILURE = ErrorCode.TRANSPORT_GIT_ERROR.value
-ERR_TASK_EXPIRED = ErrorCode.COOP_TASK_EXPIRED.value
-ERR_AGENT_REFUSED = ErrorCode.COOP_AGENT_REFUSED.value
+ERR_NO_CAPABLE_AGENT = ErrorCode.COOP_NO_CAPABLE_AGENT.value  # type: ignore[union-attr]
+ERR_TIMEOUT = ErrorCode.COOP_TIMEOUT.value  # type: ignore[union-attr]
+ERR_TRANSPORT_FAILURE = ErrorCode.TRANSPORT_GIT_ERROR.value  # type: ignore[union-attr]
+ERR_TASK_EXPIRED = ErrorCode.COOP_TASK_EXPIRED.value  # type: ignore[union-attr]
+ERR_AGENT_REFUSED = ErrorCode.COOP_AGENT_REFUSED.value  # type: ignore[union-attr]
 
 # Full mapping table for programmatic lookups.
 LEGACY_CODE_MAP: Dict[str, str] = {
